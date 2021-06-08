@@ -121,22 +121,93 @@ ${SUPPORT_CLASS_VISIBILITY_PUBLIC?public :}class ${LEGACY_EXCEPTION_HANDLING?Tok
     return super.getMessage();
   }
 
+  private final boolean structured;
+
+  private final boolean eofSeen;
+  private final int lexState;
+  private final int errorLine;
+  private final int errorColumn;
+  private final String errorAfter;
+  private final int curChar;
+
+  public boolean isStructured() {
+    return structured;
+  }
+
+  private void ensureStructured() {
+    if (!isStructured()) {
+      throw new UnsupportedOperationException("the TokenMgrError is not structured");
+    }
+  }
+
+  public boolean isEofSeen() {
+    ensureStructured();
+    return eofSeen;
+  }
+
+  public int getLexState() {
+    ensureStructured();
+    return lexState;
+  }
+
+  public int getErrorLine() {
+    ensureStructured();
+    return errorLine;
+  }
+
+  public int getErrorColumn() {
+    ensureStructured();
+    return errorColumn;
+  }
+
+  public String getErrorAfter() {
+    ensureStructured();
+    return errorAfter;
+  }
+
+  public int getCurChar() {
+    ensureStructured();
+    return curChar;
+  }
+
   /*
    * Constructors of various flavors follow.
    */
 
   /** No arg constructor. */
   public ${LEGACY_EXCEPTION_HANDLING?TokenMgrError:TokenMgrException}() {
+    structured = false;
+    eofSeen = false;
+    this.lexState = -1;
+    this.errorLine = -1;
+    this.errorColumn = -1;
+    this.errorAfter = null;
+    this.curChar = -1;
   }
 
   /** Constructor with message and reason. */
   public ${LEGACY_EXCEPTION_HANDLING?TokenMgrError:TokenMgrException}(String message, int reason) {
     super(message);
+    structured = false;
     errorCode = reason;
+    eofSeen = false;
+    this.lexState = -1;
+    this.errorLine = -1;
+    this.errorColumn = -1;
+    this.errorAfter = null;
+    this.curChar = -1;
   }
 
   /** Full Constructor. */
   public ${LEGACY_EXCEPTION_HANDLING?TokenMgrError:TokenMgrException}(boolean EOFSeen, int lexState, int errorLine, int errorColumn, String errorAfter, int curChar, int reason) {
-    this(LexicalErr(EOFSeen, lexState, errorLine, errorColumn, errorAfter, curChar), reason);
+    super(LexicalErr(EOFSeen, lexState, errorLine, errorColumn, errorAfter, curChar));
+    structured = true;
+    errorCode = reason;
+    eofSeen = EOFSeen;
+    this.lexState = lexState;
+    this.errorLine = errorLine;
+    this.errorColumn = errorColumn;
+    this.errorAfter = errorAfter;
+    this.curChar = curChar;
   }
 }

@@ -1,13 +1,12 @@
-<?xml version="1.0"?>
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>net.java.dev.javacc</groupId>
+	<groupId>com.tencent.bk.base.datalab</groupId>
 	<artifactId>javacc</artifactId>
 	<packaging>jar</packaging>
 	<name>JavaCC</name>
-	<version>7.0.4</version>
+	<version>7.0.4-bkbase.1</version>
 
-	<description>JavaCC is a parser/scanner generator for java. </description>
+	<description>JavaCC modified by Tencent blueking. </description>
 	<url>https://github.com/javacc/javacc</url>
 	<issueManagement>
 		<system>GitHub</system>
@@ -19,9 +18,8 @@
 		<url>https://javacc.org</url>
 	</organization>
 	<scm>
-		<connection>scm:git:git@github.com/javacc/javacc.git</connection>
-		<url>git@github.com/javacc/javacc.git</url>
-		<developerConnection>scm:git:git@github.com/javacc/javacc.git</developerConnection>
+		<connection>https://github.com/groobyming/javacc.git</connection>
+		<url>https://github.com/groobyming/javacc</url>
 	</scm>
 	<mailingLists>
 		<mailingList>
@@ -43,54 +41,14 @@
 	</mailingLists>
 	<developers>
 		<developer>
-			<name>Sreenivasa Viswanadha</name>
-			<id>sreeni</id>
-			<email>sreeni At dev.java.net</email>
+			<id>bk-base</id>
+			<name>bk-base</name>
+			<url>https://bk.tencent.com/</url>
+			<email>contactus_bk@tencent.com</email>
 			<roles>
-				<role>Owner</role>
+				<role>Manager</role>
 			</roles>
-			<timezone>0</timezone>
-			<organization>javacc.org</organization>
-			<organizationUrl>https://javacc.org</organizationUrl>
-		</developer>
-
-		<developer>
-			<name>Chris Ainsley</name>
-			<id>ainsleyc</id>
-			<email>ainsleyc At dev.java.net</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<timezone>0</timezone>
-			<organization>java.net</organization>
-			<organizationUrl>http://www.java.net/</organizationUrl>
-		</developer>
-
-		<developer>
-			<name>Tim Pizey</name>
-			<id>timp</id>
-			<email>timp AT paneris.org</email>
-			<roles>
-				<role>Maven maven</role>
-				<role>Developer</role>
-			</roles>
-			<timezone>0</timezone>
-			<url>http://paneris.org/~timp</url>
-			<organization>Context Computing</organization>
-			<organizationUrl>http://www.context-computing.co.uk/</organizationUrl>
-		</developer>
-
-		<developer>
-			<name>Francis ANDRE</name>
-			<id>zosrothko</id>
-			<email>zosrothko AT orange.fr</email>
-			<roles>
-				<role>Developer</role>
-			</roles>
-			<timezone>0</timezone>
-			<url>http://www.kampbell.net</url>
-			<organization>Kampbell</organization>
-			<organizationUrl>https://github.com/Kampbell/</organizationUrl>
+			<timezone>+8</timezone>
 		</developer>
 	</developers>
 	<licenses>
@@ -100,7 +58,17 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-
+	<distributionManagement>
+		<snapshotRepository>
+			<!--这里注意与setting.xml配置的severId保持一致-->
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
 	<build>
 		<sourceDirectory>src</sourceDirectory>
@@ -596,6 +564,45 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.4</version>
+				<configuration>
+					<aggregate>true</aggregate>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<sourceFileExcludes>
+								<!--忽略动态生成的java文件-->
+								<sourceFileExclude>**/target/**/*.java</sourceFileExclude>
+							</sourceFileExcludes>
+							<!--忽略javadoc生成过程中的警告，比如方法注释缺少@return @param-->
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>27B59EF7777A67354829E6F423296DF5C906EAEC</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 	<reporting>
@@ -643,14 +650,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jxr-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<configuration>
-					<minmemory>128m</minmemory>
-					<maxmemory>512m</maxmemory>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
